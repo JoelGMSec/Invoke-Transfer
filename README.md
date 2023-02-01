@@ -1,6 +1,8 @@
 <p align="center"><img width=600 alt="Invoke-Transfer" src="https://github.com/JoelGMSec/Invoke-Transfer/blob/main/Invoke-Transfer.png"></p>
 **Invoke-Transfer** is a PowerShell Clipboard Data Transfer.
+
 This tool helps you to send files in highly restricted environments such as Citrix, RDP, VNC, Guacamole.. using the clipboard function.
+
 As long as you can send text through the clipboard, you can send files simulating a keyboard, in small Base64 encoded chunks.
 
 # Requirements
@@ -9,6 +11,7 @@ As long as you can send text through the clipboard, you can send files simulatin
 
 # Download
 It is recommended to clone the complete repository or download the zip file.
+
 You can do this by running the following command:
 ```
 git clone https://github.com/JoelGMSec/Invoke-Transfer
@@ -56,8 +59,10 @@ This tool has been created and designed from scratch by Joel Gámez Molina (@Joe
 
 # Contact
 This software does not offer any kind of guarantee. Its use is exclusive for educational environments and / or security audits with the corresponding consent of the client. I am not responsible for its misuse or for any possible damage caused by it.
+
 For more information, you can find us on Twitter as [@JoelGMSec](https://twitter.com/JoelGMSec), [@3v4si0n](https://twitter.com/3v4si0n) and on my blog [darkbyte.net](https://darkbyte.net).
 
 # Support
 You can support my work buying me a coffee:
+
 [<img width=250 alt="buymeacoffe" src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png">](https://www.buymeacoffee.com/joelgmsec)
