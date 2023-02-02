@@ -5,7 +5,7 @@
 
 This tool helps you to send files in highly restricted environments such as Citrix, RDP, VNC, Guacamole.. using the clipboard function.
 
-As long as you can send text through the clipboard, you can send files simulating a keyboard, in small Base64 encoded chunks.
+As long as you can send text through the clipboard, you can send files in text format, in small Base64 encoded chunks. Additionally, you can transfer files from a screenshot, using the native OCR function of Microsoft Windows.
 
 # Requirements
 - Powershell 5.1
