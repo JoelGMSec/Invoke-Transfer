@@ -136,7 +136,7 @@ function Send-File {
       [System.Windows.Forms.SendKeys]::SendWait("^{v}")}
 
     else { [System.Windows.Forms.SendKeys]::SendWait("^{v}") }}
-  Remove-Item ".\chunk*" -Force ; Start-Sleep -Seconds 2 ; PopUpWindow }
+  Start-Sleep -Seconds 2 ; PopUpWindow }
 
 function Invoke-OCR {
   [CmdletBinding()] Param ([Parameter()]$Path)
@@ -195,4 +195,4 @@ if ($args -like "-split*") { Invoke-Split $args ; Send-File $args }
 if ($args -like "-merge*") { Invoke-Merge $args }
 if ($args -like "-guaca*") { $guacamole = "True" }
 if ($args -like "-read*") { (Invoke-OCR $args[1]).text >> $args[3] }
-Write-Host "[+] Done!`n" -ForegroundColor Green
+Remove-Item ".\chunk*" -Force ; Write-Host "[+] Done!`n" -ForegroundColor Green
