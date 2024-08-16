@@ -10,7 +10,6 @@ using namespace Windows.Graphics.Imaging
 # Design
 $ProgressPreference = "SilentlyContinue"
 $ErrorActionPreference = "SilentlyContinue"
-$Host.UI.RawUI.WindowTitle = "Invoke-Transfer - by @JoelGMSec & @3v4Si0N" 
 $Host.UI.RawUI.BackgroundColor = "Black"
 $Host.UI.RawUI.ForegroundColor = "Gray"
 
@@ -32,6 +31,8 @@ function Show-Help {
    Write-Host ; Write-Host " Usage: " -ForegroundColor Yellow -NoNewLine ; Write-Host ".\Invoke-Transfer.ps1 -split {FILE} -sec {SECONDS}" -ForegroundColor Blue 
    Write-Host "          Send 120KB chunks with a set time delay of seconds" -ForegroundColor Green
    Write-Host "          Add -guaca to send files through Apache Guacamole" -ForegroundColor Green
+   Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -plain {FILE} -sec {SECONDS}" -ForegroundColor Blue 
+   Write-Host "          Send raw keystrokes with a set time delay of seconds" -ForegroundColor Green
    Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -merge {B64FILE} -out {FILE}" -ForegroundColor Blue 
    Write-Host "          Merge Base64 file into original file in desired path" -ForegroundColor Green
    Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -read {IMGFILE} -out {FILE}" -ForegroundColor Blue 
@@ -44,7 +45,7 @@ $infile = $args[1]
 $filename = $infile.split("\")[-1]
 $seconds = $args[3]
 $extfile = $args[3]
-$outfile = "chunk"
+$outfile = "C:\programdata\chunk"
 $ext = "txt"
 $size = 120KB
 
@@ -114,6 +115,33 @@ function PopUpWindow {
   $hwnd = @(Get-Process $parentProcess)[0].MainWindowHandle
   [Win32.NativeMethods]::ShowWindowAsync($hwnd, 6) 2>&1> $null ; Start-Sleep -Seconds 0.1
   [Win32.NativeMethods]::ShowWindowAsync($hwnd, 9) 2>&1> $null }
+
+function Send-PlainFile {
+  Write-Host "[+] Reading plain file content.." -ForegroundColor Blue
+  $File = Get-Content -raw $infile ; Start-Sleep -Seconds 1
+  Write-Host "[>] Ready! Press enter to send file! " -ForegroundColor Yellow -NoNewLine
+  $Host.UI.ReadLine() 2>&1> $null ; Start-Sleep -Seconds 4
+  Write-Host "[+] Sending keystrokes.." -ForegroundColor Red
+  Start-Sleep -Seconds $seconds
+  foreach ($char in $File.ToCharArray()) {
+    switch ($char) {
+      "`r" { }
+      " " { [System.Windows.Forms.SendKeys]::SendWait(" ") }
+      "`n" { [System.Windows.Forms.SendKeys]::SendWait("~") }
+      "{"  { [System.Windows.Forms.SendKeys]::SendWait("{{}") }
+      "}"  { [System.Windows.Forms.SendKeys]::SendWait("{}}") }
+      "%"  { [System.Windows.Forms.SendKeys]::SendWait("{%}") }
+      "+"  { [System.Windows.Forms.SendKeys]::SendWait("{+}") } 
+      "^"  { [System.Windows.Forms.SendKeys]::SendWait("{^}") }
+      "~"  { [System.Windows.Forms.SendKeys]::SendWait("{~}") }
+      "("  { [System.Windows.Forms.SendKeys]::SendWait("({(}") }
+      ")"  { [System.Windows.Forms.SendKeys]::SendWait("{)}") }
+      "["  { [System.Windows.Forms.SendKeys]::SendWait("({[}") }
+      "]"  { [System.Windows.Forms.SendKeys]::SendWait("{]}") }
+      default { [System.Windows.Forms.SendKeys]::SendWait("$char") }}
+      
+  Start-Sleep -Milliseconds 100 }
+  Start-Sleep -Seconds 2 ; PopUpWindow }
 
 function Send-File { 
   Write-Host "[>] Ready! Press enter to send file! " -ForegroundColor Yellow -NoNewLine
@@ -191,6 +219,7 @@ function Invoke-OCR {
 if (!$seconds) { $seconds = 2 }
 if ($args[0] -like "-h*") { Show-Help ; break }
 if ($args[1] -eq $null) { Show-Help ; Write-Host "[!] Not enough parameters!`n" -ForegroundColor Red ; break }
+if ($args -like "-plain*") { Send-PlainFile $args }
 if ($args -like "-split*") { Invoke-Split $args ; Send-File $args }
 if ($args -like "-merge*") { Invoke-Merge $args }
 if ($args -like "-guaca*") { $guacamole = "True" }
