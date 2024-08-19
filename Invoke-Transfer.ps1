@@ -14,6 +14,7 @@ $Host.UI.RawUI.BackgroundColor = "Black"
 $Host.UI.RawUI.ForegroundColor = "Gray"
 
 # Banner
+Clear-Host
 Write-Host
 Write-Host "  ___                 _           _____                     __            " -ForegroundColor Blue
 Write-Host " |_ _|_ __ _   __ __ | | __ __   |_   _| __ __ _ _ __  ___ / _| ___ _ __  " -ForegroundColor Blue
@@ -140,14 +141,14 @@ function Send-PlainFile {
       "]"  { [System.Windows.Forms.SendKeys]::SendWait("{]}") }
       default { [System.Windows.Forms.SendKeys]::SendWait("$char") }}
       
-  Start-Sleep -Milliseconds 100 }
+  Start-Sleep -Milliseconds $($seconds*100) }
   Start-Sleep -Seconds 2 ; PopUpWindow }
 
 function Send-File { 
   Write-Host "[>] Ready! Press enter to send file! " -ForegroundColor Yellow -NoNewLine
   $Host.UI.ReadLine() 2>&1> $null ; Start-Sleep -Seconds 4
   Write-Host "[+] Sending chunks.." -ForegroundColor Red
-  Get-ChildItem | Where-Object { 
+  Get-ChildItem C:\programdata\ | Where-Object { 
     $_.Name -match '^chunk.[0-9]+\.txt$' } | Sort-Object -Property LastWriteTime, CreationTime, Name | % {
     $File = Get-Content -raw $_.fullname | Set-Clipboard ; Start-Sleep -Seconds $seconds
     if ($guacamole) {
@@ -224,4 +225,4 @@ if ($args -like "-split*") { Invoke-Split $args ; Send-File $args }
 if ($args -like "-merge*") { Invoke-Merge $args }
 if ($args -like "-guaca*") { $guacamole = "True" }
 if ($args -like "-read*") { (Invoke-OCR $args[1]).text >> $args[3] }
-Remove-Item ".\chunk*" -Force ; Write-Host "[+] Done!`n" -ForegroundColor Green
+Remove-Item "C:\programdata\chunk*" -Force ; Write-Host "[+] Done!`n" -ForegroundColor Green
