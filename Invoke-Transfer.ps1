@@ -32,7 +32,7 @@ function Show-Help {
    Write-Host ; Write-Host " Usage: " -ForegroundColor Yellow -NoNewLine ; Write-Host ".\Invoke-Transfer.ps1 -split {FILE} -sec {SECONDS}" -ForegroundColor Blue 
    Write-Host "          Send 120KB chunks with a set time delay of seconds" -ForegroundColor Green
    Write-Host "          Add -guaca to send files through Apache Guacamole" -ForegroundColor Green
-   Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -plain {FILE} -sec {SECONDS}" -ForegroundColor Blue 
+   Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -plain {FILE or TEXT} -sec {SECONDS}" -ForegroundColor Blue 
    Write-Host "          Send raw keystrokes with a set time delay of seconds" -ForegroundColor Green
    Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -merge {B64FILE} -out {FILE}" -ForegroundColor Blue 
    Write-Host "          Merge Base64 file into original file in desired path" -ForegroundColor Green
@@ -118,11 +118,15 @@ function PopUpWindow {
   [Win32.NativeMethods]::ShowWindowAsync($hwnd, 9) 2>&1> $null }
 
 function Send-PlainFile {
-  Write-Host "[+] Reading plain file content.." -ForegroundColor Blue
+  if(Test-Path $infile) {
+  Write-Host "[>] Reading plain file content.." -ForegroundColor Blue
   $File = Get-Content -raw $infile ; Start-Sleep -Seconds 1
-  Write-Host "[>] Ready! Press enter to send file! " -ForegroundColor Yellow -NoNewLine
+  Write-Host "[+] Ready! Press enter to send file! " -ForegroundColor Yellow -NoNewLine } 
+  else { $File = $infile
+  Write-Host "[>] Reading plain text content.." -ForegroundColor Blue
+  Write-Host "[+] Ready! Press enter to send keys! " -ForegroundColor Yellow -NoNewLine }
   $Host.UI.ReadLine() 2>&1> $null ; Start-Sleep -Seconds 4
-  Write-Host "[+] Sending keystrokes.." -ForegroundColor Red
+  Write-Host "[>] Sending keystrokes.." -ForegroundColor Red
   Start-Sleep -Seconds $seconds
   foreach ($char in $File.ToCharArray()) {
     switch ($char) {
@@ -139,15 +143,17 @@ function Send-PlainFile {
       ")"  { [System.Windows.Forms.SendKeys]::SendWait("{)}") }
       "["  { [System.Windows.Forms.SendKeys]::SendWait("({[}") }
       "]"  { [System.Windows.Forms.SendKeys]::SendWait("{]}") }
-      default { [System.Windows.Forms.SendKeys]::SendWait("$char") }}
+      default { [System.Windows.Forms.SendKeys]::SendWait("$char")}}
       
   Start-Sleep -Milliseconds $($seconds*100) }
   Start-Sleep -Seconds 2 ; PopUpWindow }
 
 function Send-File { 
-  Write-Host "[>] Ready! Press enter to send file! " -ForegroundColor Yellow -NoNewLine
+  Write-Host "[>] Reading chunk file content.." -ForegroundColor Blue
+  Start-Sleep -Seconds 2 
+  Write-Host "[+] Ready! Press enter to send keys! " -ForegroundColor Yellow -NoNewLine
   $Host.UI.ReadLine() 2>&1> $null ; Start-Sleep -Seconds 4
-  Write-Host "[+] Sending chunks.." -ForegroundColor Red
+  Write-Host "[>] Sending keystrokes.." -ForegroundColor Red
   Get-ChildItem C:\programdata\ | Where-Object { 
     $_.Name -match '^chunk.[0-9]+\.txt$' } | Sort-Object -Property LastWriteTime, CreationTime, Name | % {
     $File = Get-Content -raw $_.fullname | Set-Clipboard ; Start-Sleep -Seconds $seconds
@@ -213,8 +219,8 @@ function Invoke-OCR {
     $softwareBitmap = Await @params
 
     Await $ocrEngine.RecognizeAsync($softwareBitmap) ([Windows.Media.Ocr.OcrResult])}
-    Write-Host "[+] Reading $filename with OCR.." -ForegroundColor Magenta ; Start-Sleep -Seconds 2
-    Write-Host "[+] Copying text to file.." -ForegroundColor Blue ; Start-Sleep -Seconds 2 }}
+    Write-Host "[+] Reading $filename with OCR.." -ForegroundColor Yellow ; Start-Sleep -Seconds 2
+    Write-Host "[>] Copying text to file.." -ForegroundColor Blue ; Start-Sleep -Seconds 2 }}
 
 # Main
 if (!$seconds) { $seconds = 2 }
