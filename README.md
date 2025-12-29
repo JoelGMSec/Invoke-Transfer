@@ -31,7 +31,7 @@ git clone https://github.com/JoelGMSec/Invoke-Transfer
 
 ## 🚀 Usage
 
-```java
+```
 .\Invoke-Transfer.ps1 -h
 
   ___                 _           _____                     __
@@ -42,8 +42,9 @@ git clone https://github.com/JoelGMSec/Invoke-Transfer
 
   ----------------------- by @JoelGMSec & @3v4Si0N ---------------------
 
-Info:  This tool helps you to send files in highly restricted environments
-       such as Citrix, RDP, VNC, Guacamole... using the clipboard function
+
+ Info:  This tool helps you to send files in highly restricted environments
+        such as Citrix, RDP, VNC, Guacamole.. using clipboard or keystrokes
 
  Usage: .\Invoke-Transfer.ps1 -split {FILE} -sec {SECONDS}
           Send 120KB chunks with a set time delay of seconds
@@ -51,6 +52,7 @@ Info:  This tool helps you to send files in highly restricted environments
 
         .\Invoke-Transfer.ps1 -plain {FILE or TEXT} -sec {SECONDS}
           Send raw keystrokes with a set time delay of seconds
+          Add -pikvm {PiKVM_IP} to send files through PiKVM
 
         .\Invoke-Transfer.ps1 -merge {B64FILE} -out {FILE}
           Merge Base64 file into original file in desired path
@@ -60,6 +62,7 @@ Info:  This tool helps you to send files in highly restricted environments
 
  Warning: This tool only works on Windows 10 or greater
           OCR reading may not be entirely accurate
+
 ```
 
 **Available Parameters**:
@@ -100,7 +103,7 @@ This software comes with no warranty, exclusively for educational purposes and a
 
 The author is not responsible for any misuse or damage caused by this software.
 
-# ☕ Support
+## ☕ Support
 Support our work by buying us a coffee:
 
 [<img width=250 alt="buymeacoffe" src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png">](https://www.buymeacoffee.com/joelgmsec)
