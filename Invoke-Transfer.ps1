@@ -28,12 +28,13 @@ Write-Host
 # Help
 function Show-Help {
    Write-host ; Write-Host " Info: " -ForegroundColor Yellow -NoNewLine ; Write-Host " This tool helps you to send files in highly restricted environments"
-   Write-Host "        such as Citrix, RDP, VNC, Guacamole... using the clipboard function"
+   Write-Host "        such as Citrix, RDP, VNC, Guacamole.. using clipboard or keystrokes"
    Write-Host ; Write-Host " Usage: " -ForegroundColor Yellow -NoNewLine ; Write-Host ".\Invoke-Transfer.ps1 -split {FILE} -sec {SECONDS}" -ForegroundColor Blue 
    Write-Host "          Send 120KB chunks with a set time delay of seconds" -ForegroundColor Green
    Write-Host "          Add -guaca to send files through Apache Guacamole" -ForegroundColor Green
    Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -plain {FILE or TEXT} -sec {SECONDS}" -ForegroundColor Blue 
    Write-Host "          Send raw keystrokes with a set time delay of seconds" -ForegroundColor Green
+   Write-Host "          Add -pikvm {PiKVM_IP} to send files through PiKVM" -ForegroundColor Green
    Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -merge {B64FILE} -out {FILE}" -ForegroundColor Blue 
    Write-Host "          Merge Base64 file into original file in desired path" -ForegroundColor Green
    Write-Host ; Write-Host "        .\Invoke-Transfer.ps1 -read {IMGFILE} -out {FILE}" -ForegroundColor Blue 
@@ -42,6 +43,7 @@ function Show-Help {
    Write-Host "         " -NoNewLine ; Write-Host " OCR reading may not be entirely accurate" ; Write-Host }
 
 # Variables
+$PiKVM_Creds = "admin:admin"
 $infile = $args[1]
 $filename = $infile.split("\")[-1]
 $seconds = $args[3]
@@ -49,6 +51,26 @@ $extfile = $args[3]
 $outfile = "C:\programdata\chunk"
 $ext = "txt"
 $size = 120KB
+
+# HTTPS SSL/TLS Bypass
+Add-Type @"
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+
+public class TrustAllCertsPolicy : ICertificatePolicy {
+    public bool CheckValidationResult(
+        ServicePoint srvPoint, X509Certificate certificate,
+        WebRequest request, int certificateProblem) {
+        return true;
+    }
+}
+"@
+
+[System.Net.ServicePointManager]::SecurityProtocol = `
+[System.Net.SecurityProtocolType]::Tls12 -bor `
+[System.Net.SecurityProtocolType]::Tls11 -bor `
+[System.Net.SecurityProtocolType]::Tls
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
 # Assembly
 Add-Type -AssemblyName System.Windows.Forms
@@ -173,6 +195,21 @@ function Send-File {
     else { [System.Windows.Forms.SendKeys]::SendWait("^{v}") }}
   Start-Sleep -Seconds 2 ; PopUpWindow }
 
+function Send-PiKVMFile {
+  if (Test-Path $infile) {
+  $File = Get-Content -raw $infile 
+  Write-Host "[>] Reading plain file content.." -ForegroundColor Blue }
+  else { $File = $infile
+  Write-Host "[>] Reading plain text content.." -ForegroundColor Blue }
+  Write-Host "[+] Ready! Press enter to send keys! " -ForegroundColor Yellow -NoNewLine
+  $Host.UI.ReadLine() > $null
+  Start-Sleep -Seconds 4
+  Write-Host "[>] Sending keystrokes.." -ForegroundColor Red
+  Start-Sleep -Seconds $seconds
+  # Replace with "https://$pikvm/api/hid/print?keymap=es" for Spanish layout
+  foreach ($char in $File.ToCharArray()) { $pikwr = Invoke-WebRequest -UseBasicParsing "https://$pikvm/api/hid/print" -Method Post `
+  -Body "$char" -Headers @{ Authorization = ("Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("$PiKVM_Creds")))}}}
+
 function Invoke-OCR {
   [CmdletBinding()] Param ([Parameter()]$Path)
 
@@ -226,7 +263,7 @@ function Invoke-OCR {
 if (!$seconds) { $seconds = 2 }
 if ($args[0] -like "-h*") { Show-Help ; break }
 if ($args[1] -eq $null) { Show-Help ; Write-Host "[!] Not enough parameters!`n" -ForegroundColor Red ; break }
-if ($args -like "-plain*") { Send-PlainFile $args }
+if ($args -like "-plain*") { if ($args -like "-pikvm*") { $pikvm = $args[$args.IndexOf("-pikvm") + 1] ; Send-PiKVMFile } else { Send-PlainFile $args }}
 if ($args -like "-split*") { Invoke-Split $args ; Send-File $args }
 if ($args -like "-merge*") { Invoke-Merge $args }
 if ($args -like "-guaca*") { $guacamole = "True" }
