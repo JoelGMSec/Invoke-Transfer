@@ -4,19 +4,19 @@
 
 ### PowerShell Clipboard Data Transfer
 
-Invoke-Transfer is a PowerShell tool that helps you to send files in **highly restricted environments** such as Citrix, RDP, VNC or Guacamole.  
-You can send files in text format, in small **Base64 encoded chunks** or in plaintext. Additionally, you can recieve files from a screenshot, using the **native OCR function** of Microsoft Windows.
+Invoke-Transfer is a PowerShell tool that helps you to send files in **highly restricted environments** such as Citrix, RDP, VNC or Guacamole. You can send files in text format, in small **Base64 encoded chunks** or in plaintext. Additionally, you can recieve files from a screenshot, using the **native OCR function** of Microsoft Windows.
 
 
 ## ✨ Features
 
-- 📋 **Clipboard-based transfer**: Send files through clipboard in restricted environments
 - 🔀 **Base64 encoding**: Converts files to text format for easy and safe transfer
+- 📋 **Clipboard transfer**: Send files through clipboard in restricted environments
 - ⚡ **Chunked transfer**: Split files into 120KB chunks with configurable delays
-- 🖼️ **OCR support**: Read and recieve files from screenshots using Windows OCR
-- 🥑 **Guacamole compatibility**: Special mode for Apache Guacamole environments
 - ✏️ **Raw keystroke mode**: Send plain text (typewriter mode) with time delays
-- 💻 **Windows native**: Built for Windows 10+ with PowerShell 5.1
+- ⌨️ **PiKVM HID API**: Sends keystrokes via PiKVM's HID API on compatible devices
+- 🥑 **Guacamole compatibility**: Special mode for Apache Guacamole environments
+- 🖼️ **OCR support**: Read and recieve files from screenshots using Windows OCR
+- 💻 **Windows native**: Designed for modern Windows with PowerShell 5.1
 
 ## ⚙️ Requirements
 
@@ -66,12 +66,13 @@ git clone https://github.com/JoelGMSec/Invoke-Transfer
 ```
 
 **Available Parameters**:
-- `-split` → Split file into Base64 chunks for clipboard transfer
-- `-merge` → Merge Base64 chunks back into original file
-- `-read` → Use OCR to read text from screenshot
-- `-plain` → Send raw keystrokes with time delays
+- `-split` → Split file into chunks for clipboard transfer
+- `-plain` → Send raw keystrokes with custom time delays
+- `-pikvm` → Send raw keystrokes to PiKVM compatible device
 - `-guaca` → Enable Apache Guacamole compatibility mode
-- `-sec` → Set time delay between chunks in seconds
+- `-sec` → Set time delay between chunks/keystrokes in seconds
+- `-merge` → Merge Base64 chunks back into original file
+- `-read` → Use native OCR to read text from screenshot
 
 ## 📸 Screenshots
 
